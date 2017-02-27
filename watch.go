@@ -15,13 +15,13 @@ func watchDir(dirname string, srcExtension string, processedExtension string) er
 		return err
 	}
 
-	files := make([]string, 1)
+	var files []string
 	for _, file := range allfiles {
 		if file.Mode().IsRegular() {
 			files = append(files, file.Name())
 		}
 	}
-	processedFiles := make([]string, 1)
+	var processedFiles []string
 	for _, file := range files {
 		if strings.Contains(file, processedExtension) {
 			fName := strings.Split(file, processedExtension)[0]

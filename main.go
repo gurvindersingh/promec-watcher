@@ -42,8 +42,6 @@ func main() {
 	}
 	for {
 		watchDir(*dirname, *srcExtension, *processedExtension)
-		xmlMap, _ := readCommetXML("test.xml")
-		ingestToELS(xmlMap)
 		time.Sleep(interval * time.Second)
 	}
 }
