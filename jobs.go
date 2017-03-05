@@ -83,6 +83,7 @@ func getPodSpec(file string, baseFile string) apiv1.PodSpec {
 	cometParamsEnv := apiv1.EnvVar{Name: "COMET_PARAMS", Value: conf.dirname + "/" + baseFile + ".params"}
 	cometFileEnv := apiv1.EnvVar{Name: "COMET_INPUT_FILE", Value: conf.dirname + "/" + file}
 	directoryEnv := apiv1.EnvVar{Name: "INPUT_DIRECTORY", Value: conf.dirname}
+	baseFileEnv := apiv1.EnvVar{Name: "BASE_INPUT_FILE", Value: conf.dirname + "/" + baseFile}
 	uidEnv := apiv1.EnvVar{Name: "UID", Value: conf.uid}
 	gidEnv := apiv1.EnvVar{Name: "GID", Value: conf.gid}
 
