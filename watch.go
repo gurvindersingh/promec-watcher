@@ -32,11 +32,19 @@ func watchDir() ([]string, error) {
 
 	var newFiles []string
 
-	for _, file := range files {
-		for _, pfile := range processedFiles {
-			if strings.Contains(file, pfile) {
-				continue
+	if len(processedFiles) > 0 {
+		for _, file := range files {
+			for _, pfile := range processedFiles {
+				if strings.Contains(file, pfile) {
+					continue
+				}
+				if strings.Contains(file, conf.srcExtension) {
+					newFiles = append(newFiles, file)
+				}
 			}
+		}
+	} else {
+		for _, file := range files {
 			if strings.Contains(file, conf.srcExtension) {
 				newFiles = append(newFiles, file)
 			}
