@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"strings"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -16,7 +17,8 @@ func watchDir() ([]string, error) {
 
 	var files []string
 	for _, file := range allfiles {
-		if file.Mode().IsRegular() {
+		// Check if it is a file and have not been modified atleast since last minute
+		if file.Mode().IsRegular() && file.ModTime().Add(60*time.Second).Unix() < time.Now().Unix() {
 			files = append(files, file.Name())
 		}
 	}
