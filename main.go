@@ -16,7 +16,7 @@ import (
 
 var (
 	kubeconfig         = flag.String("kubeconfig", "./config", "absolute path to the kubeconfig file")
-	dirname            = flag.String("directory", ".", "path to the directory to watch")
+	dirname            = flag.String("directory", "", "path to the directory to watch")
 	sleepInterval      = flag.Int64("sleep-interval", 10, "Sleep interval in seconds")
 	srcExtension       = flag.String("source-extension", "mzML", "Source file extension which will be used to process file")
 	processedExtension = flag.String("processed-extension", "pep.xml", "Processed file extension which will be used to skip already processed files")
@@ -77,6 +77,10 @@ func setConf() {
 	if *pvcName == "" {
 		log.Fatal("You must specify the Persistent Volume Claim")
 	}
+	if *dirname == "" {
+		log.Fatal("You must specify the Directory to watch")
+	}
+
 	pvcVolSrc := apiv1.VolumeSource{PersistentVolumeClaim: &apiv1.PersistentVolumeClaimVolumeSource{ClaimName: *pvcName}}
 	conf.pvcVol = apiv1.Volume{Name: PromecVolumeName, VolumeSource: pvcVolSrc}
 	conf.volMount = apiv1.VolumeMount{Name: PromecVolumeName, MountPath: *mountPath}
