@@ -80,43 +80,32 @@ func getJob(file string) *batchv1.Job {
 
 func getPodSpec(file string, baseFile string) apiv1.PodSpec {
 
+	// Create environment variables to be exposed to POD
 	cometParamsEnv := apiv1.EnvVar{Name: "COMET_PARAMS", Value: conf.dirname + "/" + baseFile + ".params"}
 	cometFileEnv := apiv1.EnvVar{Name: "COMET_INPUT_FILE", Value: conf.dirname + "/" + file}
 	directoryEnv := apiv1.EnvVar{Name: "INPUT_DIRECTORY", Value: conf.dirname}
 	baseFileEnv := apiv1.EnvVar{Name: "BASE_INPUT_FILE", Value: conf.dirname + "/" + baseFile}
 	uidEnv := apiv1.EnvVar{Name: "UID", Value: conf.uid}
 	gidEnv := apiv1.EnvVar{Name: "GID", Value: conf.gid}
+	indexEnv := apiv1.EnvVar{Name: "INDEX_NAME", Value: conf.indexName}
+	elsHostEnv := apiv1.EnvVar{Name: "ELS_HOST", Value: conf.elsHost}
 
 	// Comet container
-	cometContainer := apiv1.Container{
-		Name:            "comet",
-		Image:           conf.cometImg,
-		ImagePullPolicy: apiv1.PullAlways,
-		Command:         []string{"/bin/comet.sh"},
-		Resources: apiv1.ResourceRequirements{
-			Requests: apiv1.ResourceList{"cpu": conf.cometCPU, "memory": conf.cometMemory},
-			Limits:   apiv1.ResourceList{"cpu": conf.cometCPU, "memory": conf.cometMemory}},
-		VolumeMounts: []apiv1.VolumeMount{conf.volMount},
-		Env:          []apiv1.EnvVar{cometParamsEnv, cometFileEnv, directoryEnv, uidEnv, gidEnv, baseFileEnv},
-	}
-
-	// Indexer container
-	indexContainer := apiv1.Container{
-		Name:            "indexer",
+	cometIndexerContainer := apiv1.Container{
+		Name:            "comet-indexer",
 		Image:           conf.indexerImg,
 		ImagePullPolicy: apiv1.PullAlways,
-		Args:            []string{"-pepxml=" + conf.dirname + "/" + baseFile + "." + conf.processedExtension, "-host=" + conf.elsHost, "-index=" + conf.indexName},
 		Resources: apiv1.ResourceRequirements{
 			Requests: apiv1.ResourceList{"cpu": conf.indexerCPU, "memory": conf.indexerMemory},
 			Limits:   apiv1.ResourceList{"cpu": conf.indexerCPU, "memory": conf.indexerMemory}},
-		Env:          []apiv1.EnvVar{uidEnv, gidEnv},
 		VolumeMounts: []apiv1.VolumeMount{conf.volMount},
+		Env:          []apiv1.EnvVar{cometParamsEnv, cometFileEnv, directoryEnv, uidEnv, gidEnv, baseFileEnv, indexEnv, elsHostEnv},
 	}
 
 	// Create the Job POD
 	podSpec := apiv1.PodSpec{
 		RestartPolicy: apiv1.RestartPolicyOnFailure,
-		Containers:    []apiv1.Container{cometContainer, indexContainer},
+		Containers:    []apiv1.Container{cometIndexerContainer},
 		Volumes:       []apiv1.Volume{conf.pvcVol},
 	}
 

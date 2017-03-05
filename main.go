@@ -22,11 +22,8 @@ var (
 	processedExtension = flag.String("processed-extension", "pep.xml", "Processed file extension which will be used to skip already processed files")
 	loglevel           = flag.String("loglevel", "info", "Log level used for printing logs")
 	namespace          = flag.String("namespace", "default", "Kubernetes Namespace to manage")
-	cometCPU           = flag.String("comet-cpu", "1024m", "Amout of CPU to give comet process. It is multiple of 1024 (1 CPU)")
-	cometMemory        = flag.String("comet-memory", "1Gi", "Amout of memory to give comet process")
 	indexerCPU         = flag.String("indexer-cpu", "500m", "Amout of CPU to give indexer process. It is multiple of 1024 (1 CPU)")
 	indexerMemory      = flag.String("indexer-memory", "500Mi", "Amout of memory to give indexer process")
-	cometImg           = flag.String("comet-image", "gurvin/comet:0.1.1", "Container Image name which has comet software installed")
 	indexerImg         = flag.String("indexer-image", "gurvin/promec-indexer:0.1", "Container Image name which has Indexer software installed")
 	pvcName            = flag.String("pvc-name", "", "Kubernetes Persistent volume claim name which has proteomics data")
 	mountPath          = flag.String("mount-path", "/data", "Mount path where PVC will be mounted inside container")
@@ -41,11 +38,8 @@ type Conf struct {
 	srcExtension       string
 	processedExtension string
 	namespace          string
-	cometCPU           resource.Quantity
-	cometMemory        resource.Quantity
 	indexerCPU         resource.Quantity
 	indexerMemory      resource.Quantity
-	cometImg           string
 	indexerImg         string
 	pvcVol             apiv1.Volume
 	volMount           apiv1.VolumeMount
@@ -72,7 +66,6 @@ func setConf() {
 	conf.srcExtension = *srcExtension
 	conf.processedExtension = *processedExtension
 	conf.namespace = *namespace
-	conf.cometImg = *cometImg
 	conf.indexerImg = *indexerImg
 	conf.elsHost = *elsHost
 	conf.indexName = *indexName
@@ -92,16 +85,6 @@ func setConf() {
 	conf.volMount = apiv1.VolumeMount{Name: PromecVolumeName, MountPath: *mountPath}
 
 	var err error
-	conf.cometCPU, err = resource.ParseQuantity(*cometCPU)
-	if err != nil {
-		log.Fatal("Failed in parsing comet CPU value ", err)
-	}
-
-	conf.cometMemory, err = resource.ParseQuantity(*cometMemory)
-	if err != nil {
-		log.Fatal("Failed in parsing comet Memory value ", err)
-	}
-
 	conf.indexerCPU, err = resource.ParseQuantity(*indexerCPU)
 	if err != nil {
 		log.Fatal("Failed in parsing comet CPU value ", err)
