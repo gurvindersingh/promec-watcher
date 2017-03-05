@@ -83,6 +83,8 @@ func getPodSpec(file string, baseFile string) apiv1.PodSpec {
 	cometParamsEnv := apiv1.EnvVar{Name: "COMET_PARAMS", Value: conf.dirname + "/" + baseFile + ".params"}
 	cometFileEnv := apiv1.EnvVar{Name: "COMET_INPUT_FILE", Value: conf.dirname + "/" + file}
 	directoryEnv := apiv1.EnvVar{Name: "INPUT_DIRECTORY", Value: conf.dirname}
+	uidEnv := apiv1.EnvVar{Name: "UID", Value: conf.uid}
+	gidEnv := apiv1.EnvVar{Name: "GID", Value: conf.gid}
 
 	// Comet container
 	cometContainer := apiv1.Container{
@@ -92,7 +94,7 @@ func getPodSpec(file string, baseFile string) apiv1.PodSpec {
 		Command:         []string{"/bin/comet.sh"},
 		Resources:       apiv1.ResourceRequirements{Requests: apiv1.ResourceList{"cpu": conf.cometCPU, "memory": conf.cometMemory}},
 		VolumeMounts:    []apiv1.VolumeMount{conf.volMount},
-		Env:             []apiv1.EnvVar{cometParamsEnv, cometFileEnv, directoryEnv},
+		Env:             []apiv1.EnvVar{cometParamsEnv, cometFileEnv, directoryEnv, uidEnv, gidEnv},
 	}
 
 	// Indexer container
@@ -102,6 +104,7 @@ func getPodSpec(file string, baseFile string) apiv1.PodSpec {
 		ImagePullPolicy: apiv1.PullIfNotPresent,
 		Args:            []string{"-pepxml=" + conf.dirname + "/" + baseFile + "." + conf.processedExtension, "-host=" + conf.elsHost, "-index=" + conf.indexName},
 		Resources:       apiv1.ResourceRequirements{Requests: apiv1.ResourceList{"cpu": conf.indexerCPU, "memory": conf.indexerMemory}},
+		Env:             []apiv1.EnvVar{uidEnv, gidEnv},
 		VolumeMounts:    []apiv1.VolumeMount{conf.volMount},
 	}
 

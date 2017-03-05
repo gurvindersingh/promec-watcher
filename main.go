@@ -32,6 +32,8 @@ var (
 	mountPath          = flag.String("mount-path", "/data", "Mount path where PVC will be mounted inside container")
 	elsHost            = flag.String("elasticsearch-host", "http://localhost:9200", "Full path with scheme and port to elasticsearch host for indexing pepm xml data")
 	indexName          = flag.String("index-name", "promec", "Elasticsearch index name to put pep xml data in")
+	uid                = flag.String("uid", "999", "User ID to be used in lauching the comet and indexer jobs")
+	gid                = flag.String("gid", "999", "Group ID to be used in lauching the comet and indexer jobs")
 )
 
 type Conf struct {
@@ -50,6 +52,8 @@ type Conf struct {
 	mountPath          string
 	elsHost            string
 	indexName          string
+	uid                string
+	gid                string
 }
 
 var conf = new(Conf)
@@ -72,6 +76,8 @@ func setConf() {
 	conf.indexerImg = *indexerImg
 	conf.elsHost = *elsHost
 	conf.indexName = *indexName
+	conf.uid = *uid
+	conf.gid = *gid
 
 	// Setup the volume from PVC and Volume Mount
 	if *pvcName == "" {
