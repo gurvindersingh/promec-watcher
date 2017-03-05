@@ -91,22 +91,26 @@ func getPodSpec(file string, baseFile string) apiv1.PodSpec {
 	cometContainer := apiv1.Container{
 		Name:            "comet",
 		Image:           conf.cometImg,
-		ImagePullPolicy: apiv1.PullIfNotPresent,
+		ImagePullPolicy: apiv1.PullAlways,
 		Command:         []string{"/bin/comet.sh"},
-		Resources:       apiv1.ResourceRequirements{Requests: apiv1.ResourceList{"cpu": conf.cometCPU, "memory": conf.cometMemory}},
-		VolumeMounts:    []apiv1.VolumeMount{conf.volMount},
-		Env:             []apiv1.EnvVar{cometParamsEnv, cometFileEnv, directoryEnv, uidEnv, gidEnv},
+		Resources: apiv1.ResourceRequirements{
+			Requests: apiv1.ResourceList{"cpu": conf.cometCPU, "memory": conf.cometMemory},
+			Limits:   apiv1.ResourceList{"cpu": conf.cometCPU, "memory": conf.cometMemory}},
+		VolumeMounts: []apiv1.VolumeMount{conf.volMount},
+		Env:          []apiv1.EnvVar{cometParamsEnv, cometFileEnv, directoryEnv, uidEnv, gidEnv, baseFileEnv},
 	}
 
 	// Indexer container
 	indexContainer := apiv1.Container{
 		Name:            "indexer",
 		Image:           conf.indexerImg,
-		ImagePullPolicy: apiv1.PullIfNotPresent,
+		ImagePullPolicy: apiv1.PullAlways,
 		Args:            []string{"-pepxml=" + conf.dirname + "/" + baseFile + "." + conf.processedExtension, "-host=" + conf.elsHost, "-index=" + conf.indexName},
-		Resources:       apiv1.ResourceRequirements{Requests: apiv1.ResourceList{"cpu": conf.indexerCPU, "memory": conf.indexerMemory}},
-		Env:             []apiv1.EnvVar{uidEnv, gidEnv},
-		VolumeMounts:    []apiv1.VolumeMount{conf.volMount},
+		Resources: apiv1.ResourceRequirements{
+			Requests: apiv1.ResourceList{"cpu": conf.indexerCPU, "memory": conf.indexerMemory},
+			Limits:   apiv1.ResourceList{"cpu": conf.indexerCPU, "memory": conf.indexerMemory}},
+		Env:          []apiv1.EnvVar{uidEnv, gidEnv},
+		VolumeMounts: []apiv1.VolumeMount{conf.volMount},
 	}
 
 	// Create the Job POD
